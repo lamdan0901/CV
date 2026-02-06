@@ -1,0 +1,45 @@
+
+3-4mins
+- Intro to yourself
+- Projects
+- Significant project with reason.
+
+-----------
+
+Hi, I'm Anderson. Graduated in Information Technology from PTIT, I have expertise in frontend development for more than 3 years.
+I'm passtionated in creating responsive, performant and scalable web applications that solve real-world problems.
+I started coding after getting frustrated with some clunky websites, and I realized I wanted to be the person who made the internet less painful and more beautiful.
+Today, I help teams turn complex ideas, designs into clean, intuitive interfaces — so users stay engaged and businesses grow without friction.
+
+I'm seeking a new role that allows me to:
+- Leverage my frontend development expertise. 
+- Work on innovative projects and bring my values to the company
+- Grow professionally in a dynamic and collaborative environment
+
+I was involved in many projects, but these are the notable achievements:
+
+Supra IDE - A sophisticated online Move language editor, specifically designed for developing and interacting with Supra blockchain smart contracts. The application provides a complete development environment similar to VSCode but specialized for Move language
+
+Supra Multi‑Signature Web3 Wallet, A React dApp for creating and managing multi‑signature wallets on Supra, focusing on enhancing security, decentralization, and collaborative control over digital assets.
+
+Sentbe Back office
+A comprehensive backoffice solution designed for internal Sentbe teams to efficiently
+manage users, financial transactions, and multi-country operations from a single platform, resulting in improved operational efficiency and data management.
+
+A Projects Management tool for managing projects, tasks, and team collaboration, offering features like task assignment, progress tracking, and deadline management
+
+A comprehensive Hospital Information platform for managing patient information, scheduling, and medical
+records, designed to streamline hospital operations and improve patient care.
+
+And finally, A Personal Project called Base Dict.
+it's A specialized platform for Vietnamese learners of Japanese, featuring interactive JLPT
+practice tests, translation and more.
+
+One project that is my favorite and is the one that I'm most proud of is the most recent one - Supra IDE.
+In this project, I Implemented custom Monaco language support for Move language, with syntax highlighting, inline error detection and code completion.
+The project also allows user to compile, build and deploy Move smart contract.
+The biggest challenge was the View and Run functions. I had to create a screen that let user build and run  functions from any valid supra smart contract address.
+This was a first for Supra, like what other blockchains do, but totally new here.
+I did all this work on the front end despite limited resources and documentation.
+
+That's it about me. Thank you for listening.

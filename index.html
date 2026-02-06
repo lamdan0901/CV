@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lam Ho Resume</title>
+    <title>Lam Ho Sy Resume</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -34,17 +34,34 @@
         display: block;
         margin: 10px 0;
       }
-	  
-      .summary-section{
+
+      .summary-section {
         line-height: 28px;
       }
-
-      .projects .more-info{
-        font-size: 14px;
-
-        li {
-          line-height: 20px;
+	  
+	  .projects {
+		padding-top: 24px;
+	  
+		li {
+          line-height: 24px;
         }
+	  }
+
+      .projects .more-info {
+        font-size: 14px;
+        display: flex;
+
+        li:first-child {
+          flex-basis: 180px;
+        }
+      }
+
+      .job-grid {
+        display: grid;
+        grid-template-columns: 125px 300px;
+        row-gap: 2px;
+        align-items: center;
+        margin-bottom: 8px;
       }
 
       h2 {
@@ -66,7 +83,7 @@
       section {
         margin-bottom: 30px;
         display: block;
-        max-width: 740px;
+        max-width: 900px;
         margin: 30px auto;
       }
 
@@ -95,7 +112,8 @@
   </head>
   <body>
     <section class="info">
-      <h1>Ho Sy Lam</h1> <!-- Anderson Ho | Lam Ho Sy -->
+      <h1>Ho Sy Lam</h1>
+      <!-- Anderson Ho | Lam Ho Sy | Ho Sy Lam -->
       <div class="info-content">
         <div class="info-item">
           <svg
@@ -113,7 +131,7 @@
             <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
             <circle cx="12" cy="10" r="3" />
           </svg>
-          <span> Cau Giay, Hanoi, Vietnam</span>
+          <span> Hanoi, Vietnam</span>
         </div>
         <div class="info-item">
           <svg
@@ -178,7 +196,7 @@
             <rect width="4" height="12" x="2" y="9" />
             <circle cx="4" cy="4" r="2" />
           </svg>
-          <a href="https://www.linkedin.com/in/lam-ho-786288174/">Lam Ho</a>
+          <a href="https://www.linkedin.com/in/lam-ho-786288174/">LinkedIn</a>
         </div>
         <div class="info-item">
           <svg
@@ -198,130 +216,162 @@
             />
             <path d="M9 18c-4.51 2-5-2-7-2" />
           </svg>
-          <a href="https://github.com/lamdan0901">lamdan0901</a>
+          <a href="https://github.com/lamdan0901">Github</a>
         </div>
       </div>
     </section>
 
     <section class="summary">
       <h2>Summary</h2>
-      <div class='summary-section'>
-        Frontend web developer with 3 years of experience specializing in ReactJS.
-		<br/>
-		Passionate about crafting intuitive and responsive user interfaces, optimizing performance, and implementing innovative solutions to complex problems. 
-       <br/>
-		Committed to writing clean code, optimizing performance, and ongoing learning.
+      <div class="summary-section">
+        Versatile frontend developer with nearly 4 years of experience building
+        high-performance ReactJS web applications across healthcare, blockchain
+        and fintech sectors.<br />
+        Proven track record of reducing page load time by 20%, mentoring fresh
+        graduates
+
+        <br />
+        and integrating AI tools to streamline workflows.<br />
+        Quick learner and innovative thinker passionate about creating seamless
+        user experiences.
       </div>
     </section>
 
     <section class="work-exp">
       <h2>Working Experience</h2>
-      <b>Web Developer</b> | Sotatek., JSC | <i>Hanoi, Vietnam</i> |
-      <i>Feb 2022 - Now</i>
+
+      <div class="job-grid">
+        <b>NetaLabs</b>
+        <i>April 2025 - Now</i>
+
+        <b>Sotatek., JSC</b>
+        <i>February 2022 - March 2025</i>
+      </div>
 
       <ul>
         <li>
           Developed and maintained responsive user interfaces for web
-          applications using ReactJS and modern web development practices.
+          applications<br /> using ReactJS
+          and modern web development practices.
         </li>
         <li>
-          Implemented reusable components and state management solutions to
-          ensure efficient and scalable code.
+          Implemented reusable components and state management solutions<br />
+          to ensure efficient and scalable code.
         </li>
         <li>
           Collaborated with cross-functional teams to design and develop
           responsive web applications.
         </li>
+        <li>Integrated front-end functionalities with backend APIs</li>
         <li>
-          Integrated front-end functionalities with backend APIs developed by
-          backend teams.
+          Reduced page load times by up to 20% through performance tuning
+          techniques,<br />
+          improving overall user experience and application speed.
         </li>
-        <li>Reduced page load times by up to 20% through performance tuning techniques, improving overall user experience and application speed.</li>
-        <li>Mentored intern developers and contributed to code reviews.</li>
         <li>
-          Explored and implemented new front-end technologies to enhance
+          Mentored 3+ fresh graduates, providing code reviews and technical
+          guidance <br />that led to a 15% increase in feature delivery speed
+          within the team.
+        </li>
+        <li>
+          Explored and implemented new tools and technologies to enhance
           development efficiency.
         </li>
         <li>
-          Demonstrated experience in collaborating directly with US customers,
+          Demonstrated experience in collaborating directly with US and Korean
+          clients,<br />
           ensuring effective communication and project delivery.
         </li>
       </ul>
     </section>
-	<br/>
 
     <section class="projects">
       <h2>Projects</h2>
       <ul>
         <li>
-          <b>Hospital Information System</b><br />
+          <a href="https://ide.supra.com" target="_blank"> <b>Supra IDE</b></a>
+          - together with <a href="https://supra.com/" target="_blank">SUPRA</a
+          ><br />
+          <span
+            >A sophisticated online Move language editor, specifically designed
+            for developing and interacting with Supra blockchain smart
+            contracts. The application provides a complete development
+            environment similar to VSCode but specialized for Move 
+            language.</span
+          >
+          <ul class="more-info">
+            <li>Duration: 4 months</li>
+            <li>Stack: React, Vite, Typescript, Chakra UI</li>
+          </ul>
+        </li>
+        <li>
+          <b>Sentbe Backoffice</b><br /><span
+            >A comprehensive backoffice solution designed for internal Sentbe
+            teams to efficiently manage users, financial transactions, and
+            multi-country operations from a single platform, resulting in
+            improved operational efficiency and data management.</span
+          >
+          <ul class="more-info">
+            <li>Duration: 9 months</li>
+            <li>Stack: Nextjs, Typescript, Shadcn, TailwindCSS</li>
+          </ul>
+        </li>
+        <li>
+          <b>SmartKarte</b> - A Hospital Information System<br />
           <span
             >A comprehensive platform for managing patient information,
             scheduling, and medical records, designed to streamline hospital
             operations and improve patient care.</span
           >
-          <ul class="more-info">  <li>Duration: 1.5 year</li>
-          <li>Stack: React, Typescript, MUI</li></ul>
+          <ul class="more-info">
+            <li>Duration: 1.5 year</li>
+            <li>Stack: React, Typescript, MUI</li>
+          </ul>
         </li>
         <li>
-          <b>Real Estate Web App</b><br /><span
-            >A web application designed to connect buyers and sellers in the
-            real estate market, featuring property listings, search filters, and
-            contact management.</span
+          <b><a href='https://github.com/lamdan0901/basedict-fe' target="_blank">BaseDict.com</a></b> - A Personal Project<br />
+          <span
+            >A specialized platform for Vietnamese learners of Japanese,
+ featuring interactive JLPT practice tests, translation and more.</span
           >
-         <ul class="more-info">  <li>Duration: 5 months</li>
-          <li>Stack: Nextjs, Typescript, MUI</li></ul>
+          <ul class="more-info">
+            <li>Duration: 3 months</li>
+            <li>Stack: Nextjs, Typescript, Shadcn, Tailwind</li>
+          </ul>
         </li>
-        <li>
-          <b>Projects Management Web App</b><br /><span
-            >A tool for managing projects, tasks, and team collaboration,
-            offering features like task assignment, progress tracking, and
-            deadline management.</span
-          >
-        <ul class="more-info">   <li>Duration: 8 months</li>
-          <li>Stack: Nextjs, Typescript, Ant.design</li></ul>
-        </li>
-        <li>
-          <b>Social and E-commerce platform</b><br /><span
-            >A hybrid platform that combines social networking features with
-            e-commerce capabilities, enabling merchants to reach customers
-            through social interactions and direct sales.</span
-          >
-         <ul class="more-info">  <li>Duration: 6 months</li>
-          <li>Stack: React, Typescript, Tailwind</li></ul>
-        </li>
-        <li>
-          <b>Personal Project</b>
-          <ul>    <li>
-              <a href="https://github.com/lamdan0901/basedict-fe">
-                BaseDict.com</a
-              >
-              - A specialized platform for Vietnamese learners of Japanese, featuring interactive JLPT practice tests, translation and more.
-       
-         
-             <ul class="more-info">   <li>Duration: 3 months</li>
-          <li>Stack: Nextjs, Typescript, Shadcn, Tailwind</li></ul>     </li> </ul>
-        </li>
+        <p></p>
+        <small> And many other projects... </small>
       </ul>
     </section>
 
     <section class="skills">
       <h2>Skills</h2>
-	  <ul>
-		  <li><b>Frontend Development:</b> Expertise in modern web development with ReactJS, TypeScript, and Next.js. 
-		  <br/>Passionate about responsive and accessible design using TailwindCSS, MUI, and Ant.design.</li>
+      <ul>
+        <li>
+          <b>Frontend Development:</b> Expertise in modern web development with
+          HTML5, CSS3, ReactJS, TypeScript, and NextJS, TailwindCSS, Shadcn,
+          Antd, MUI,...
+        </li>
 
-		  <li><b>Backend Development:</b> Hands-on experience in developing scalable RESTful APIs with Node.js, Express.js and managing PostgreSQL, MongoDB databases.</li>
+        <li>
+          <b>Backend Development:</b> Hands-on experience in developing scalable
+          RESTful APIs with Node.js application and managing databases.
+        </li>
 
-		  <li><b>Tools & Technologies:</b> Have an understanding of blockchain technology and cryptocurrency concepts.
-		  <br/>Good at problem-solving skill and critical thinking.
-		  <br/>Familiar with Git, Agile, Figma, Vite, SEO principles, Zustand, RESTful API,...</li>
-	  </ul>
+        <li>
+          <b>Tools & Technologies:</b> Git, Figma, Redux, Agentic AI,
+          Agile/Scrum,...
+        </li>
+
+        <li>
+          <b>Soft Skills:</b> Problem-solving, Critical thinking, Effective
+          communication, Team collaboration
+        </li>
+        <li><b>Languages:</b> English (Intermediate)</li>
+      </ul>
     </section>
-	<br/>
-<!--  Skilled in leveraging Generative AI for development. 
-	  <br/>
-	  Enhance SEO and improve user engagement through chatbot development and content automation.  -->
+    <!--  Skilled in leveraging Generative AI for development.  SEO principles,Vite,   , RTK Query, Redux-toolkit, Zustand, React hooks, React Router,React hooks, Context API
+	  <br/>  -->
     <section class="degree">
       <h2>Education</h2>
       <b>Posts and Telecommunications Institute of Technology (PTIT)</b><br />

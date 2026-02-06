@@ -14,13 +14,16 @@ async function generatePDF() {
       },
       pdf: {
         margin: {
-          top: "60px",
-          bottom: "50px",
+          top: "0px",
+          bottom: "20px",
+          left: "40px",
+          right: "40px",
         },
+        width: "1000px",
       },
     });
 
-    await fs.writeFile("cv.pdf", pdf);
+    await fs.writeFile("Ho-Sy-Lam-CV.pdf", pdf);
 
     console.log("PDF generated successfully: cv.pdf");
   } catch (error) {
