@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -12,6 +12,139 @@
     />
     <!-- <link rel="stylesheet" href="style.css" /> -->
     <style>
+      /* Editor UI Styles - These will be hidden in PDF */
+      .editable-field {
+        cursor: text;
+        transition:
+          background-color 0.2s,
+          outline 0.2s;
+        border-radius: 4px;
+      }
+
+      .editable-field:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+        outline: 1px dashed #ccc;
+      }
+
+      .editable-field:focus {
+        background-color: rgba(255, 255, 255, 1);
+        outline: 2px solid #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+      }
+
+      /* Floating Format Toolbar */
+      #format-toolbar {
+        position: absolute;
+        display: none;
+        background: #333;
+        border-radius: 4px;
+        padding: 4px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        z-index: 10000;
+        gap: 4px;
+      }
+
+      #format-toolbar button {
+        background: transparent;
+        border: none;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 2px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: serif;
+        font-weight: bold;
+        font-size: 16px;
+      }
+
+      #format-toolbar button:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      #format-toolbar::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #333 transparent transparent transparent;
+      }
+
+      /* Toolbar Styles */
+      #editor-toolbar {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        z-index: 9999;
+        border: 1px solid #eee;
+      }
+
+      #save-pdf-btn {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: "Open Sans", sans-serif;
+      }
+
+      #save-pdf-btn:hover {
+        background-color: #0056b3;
+      }
+
+      /* Print Styles for PDF Generation */
+      @media print {
+        @page {
+          margin: 10mm;
+          size: A4 portrait;
+        }
+
+        body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
+        .editable-field {
+          outline: none !important;
+          background-color: transparent !important;
+        }
+
+        #editor-toolbar,
+        #format-toolbar {
+          display: none !important;
+        }
+
+        section {
+          margin-top: 0 !important;
+          margin-bottom: 20px !important;
+          page-break-inside: avoid;
+        }
+
+        h1 {
+          margin-top: 0 !important;
+        }
+
+        /* Ensure links are black */
+        a {
+          color: black !important;
+          text-decoration: none !important;
+        }
+      }
+
       body {
         font-family: "Open Sans", sans-serif;
         font-size: 18px;
@@ -21,7 +154,7 @@
 
       a {
         text-decoration: none;
-        text-decoration: underline;
+        border-bottom: 1px solid black;
         color: black;
       }
       a:hover {
@@ -38,14 +171,14 @@
       .summary-section {
         line-height: 28px;
       }
-	  
-	  .projects {
-		padding-top: 24px;
-	  
-		li {
+
+      .projects {
+        padding-top: 24px;
+
+        li {
           line-height: 24px;
         }
-	  }
+      }
 
       .projects .more-info {
         font-size: 14px;
@@ -251,8 +384,8 @@
       <ul>
         <li>
           Developed and maintained responsive user interfaces for web
-          applications<br /> using ReactJS
-          and modern web development practices.
+          applications<br />
+          using ReactJS and modern web development practices.
         </li>
         <li>
           Implemented reusable components and state management solutions<br />
@@ -296,7 +429,7 @@
             >A sophisticated online Move language editor, specifically designed
             for developing and interacting with Supra blockchain smart
             contracts. The application provides a complete development
-            environment similar to VSCode but specialized for Move 
+            environment similar to VSCode but specialized for Move
             language.</span
           >
           <ul class="more-info">
@@ -329,10 +462,16 @@
           </ul>
         </li>
         <li>
-          <b><a href='https://github.com/lamdan0901/basedict-fe' target="_blank">BaseDict.com</a></b> - A Personal Project<br />
+          <b
+            ><a href="https://github.com/lamdan0901/basedict-fe" target="_blank"
+              >BaseDict.com</a
+            ></b
+          >
+          - A Personal Project<br />
           <span
             >A specialized platform for Vietnamese learners of Japanese,
- featuring interactive JLPT practice tests, translation and more.</span
+            featuring interactive JLPT practice tests, translation and
+            more.</span
           >
           <ul class="more-info">
             <li>Duration: 3 months</li>
@@ -377,5 +516,27 @@
       <b>Posts and Telecommunications Institute of Technology (PTIT)</b><br />
       Bachelor's degree in Information Technology
     </section>
+
+    <!-- Format Toolbar -->
+    <div id="format-toolbar">
+      <button data-command="bold" title="Bold">B</button>
+      <button data-command="italic" title="Italic">I</button>
+      <button data-command="underline" title="Underline">U</button>
+      <button data-command="createLink" title="Link">🔗</button>
+      <button data-command="unlink" title="Remove Link" style="display: none">
+        ❌
+      </button>
+    </div>
+
+    <!-- Editor Toolbar -->
+    <div id="editor-toolbar">
+      <span style="font-size: 14px; color: #666"
+        >Interactive Resume Editor</span
+      >
+      <button id="save-pdf-btn">Save as PDF</button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="editor.js"></script>
   </body>
 </html>
