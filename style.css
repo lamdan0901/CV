@@ -110,7 +110,6 @@
   transition:
     background-color 0.2s,
     outline 0.2s;
-  border-radius: 4px;
 }
 
 .editable-field:hover {
