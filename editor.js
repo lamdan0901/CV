@@ -246,8 +246,9 @@ function validateForm() {
   });
 
   if (!isValid) {
-    alert(
+    showToast(
       "Please fill in all required fields (Name, Contact Info) before saving.",
+      "error",
     );
   }
 
@@ -392,9 +393,9 @@ function importJSON(event, editableAreas) {
       const data = JSON.parse(e.target.result);
       setEditableData(data, editableAreas);
       saveToLocal(editableAreas); // Sync to local
-      alert("Data imported successfully!");
+      showToast("Data imported successfully!", "success");
     } catch (error) {
-      alert("Error importing file: " + error.message);
+      showToast("Error importing file: " + error.message, "error");
     }
   };
   reader.readAsText(file);
@@ -431,7 +432,7 @@ function setupCloudModal(editableAreas) {
     let binId = binIdInput.value.trim();
 
     if (!apiKey) {
-      alert("API Key is required");
+      showToast("API Key is required", "error");
       return;
     }
 
@@ -446,7 +447,7 @@ function setupCloudModal(editableAreas) {
     const apiKey = apiKeyInput.value.trim();
     const binId = binIdInput.value.trim();
     if (!apiKey) {
-      alert("Enter API Key");
+      showToast("Enter API Key", "error");
       return;
     }
 
@@ -484,7 +485,7 @@ async function handleGlobalSave(editableAreas, isManual = false) {
   if (apiKey) {
     await saveToCloud(editableAreas, apiKey, binId, isManual);
   } else if (isManual) {
-    alert("Changes saved locally!");
+    showToast("Changes saved locally!", "success");
   }
 }
 
@@ -518,15 +519,15 @@ async function saveToCloud(editableAreas, apiKey, binId, isManual = false) {
       binId = result.metadata.id;
       localStorage.setItem("jsonbin_bin_id", binId);
       document.getElementById("bin-id").value = binId;
-      if (isManual) alert(`New Bin Created! ID: ${binId}`);
+      if (isManual) showToast(`New Bin Created! ID: ${binId}`, "success");
     } else if (isManual) {
-      alert("Saved to Cloud Successfully!");
+      showToast("Saved to Cloud Successfully!", "success");
     }
 
     console.log("Saved to cloud", result);
   } catch (e) {
     console.error("Cloud save failed", e);
-    if (isManual) alert("Cloud save failed: " + e.message);
+    if (isManual) showToast("Cloud save failed: " + e.message, "error");
   }
 }
 
@@ -547,11 +548,36 @@ async function loadFromCloud(editableAreas, apiKey, binId, isTest = false) {
     if (!isTest) {
       setEditableData(result.record, editableAreas);
       saveToLocal(editableAreas);
-      alert("Data loaded from cloud!");
+      showToast("Data loaded from cloud!", "success");
     }
     return result;
   } catch (e) {
     console.error("Cloud load failed", e);
     throw e;
   }
+}
+
+function showToast(message, type = "info") {
+  const container = document.getElementById("toast-container");
+  if (!container) return;
+
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.innerText = message;
+
+  container.appendChild(toast);
+
+  // Trigger reflow to enable transition
+  void toast.offsetWidth;
+  toast.classList.add("show");
+
+  // Remove after 3 seconds
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => {
+      if (toast.parentNode === container) {
+        container.removeChild(toast);
+      }
+    }, 300);
+  }, 3000);
 }
