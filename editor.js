@@ -283,9 +283,27 @@ function generatePDF() {
 
 /* Persistence Logic */
 
+function getStoredData() {
+  return {
+    apiKey: localStorage.getItem("jsonbin_api_key"),
+    binId: localStorage.getItem("jsonbin_bin_id"),
+    localData: localStorage.getItem("cv_data"),
+  };
+}
+
 function setupPersistence(editableAreas) {
   // Load initial data
   loadFromLocal(editableAreas);
+
+  // Auto-load from cloud on page load if cloud is configured
+  const { apiKey, binId } = getStoredData();
+
+  if (apiKey && binId) {
+    console.log("Cloud credentials found, attempting cloud restore...");
+    loadFromCloud(editableAreas, apiKey, binId, false).catch((e) =>
+      console.error("Auto-restore failed", e),
+    );
+  }
 
   // Auto-save on input
   document.addEventListener("input", (e) => {
@@ -357,7 +375,7 @@ function saveToLocal(editableAreas) {
 }
 
 function loadFromLocal(editableAreas) {
-  const dataStr = localStorage.getItem("cv_data");
+  const dataStr = getStoredData().localData;
   if (dataStr) {
     try {
       const data = JSON.parse(dataStr);
@@ -409,13 +427,15 @@ function setupCloudModal(editableAreas) {
   const span = document.getElementsByClassName("close")[0];
   const saveSettingsBtn = document.getElementById("save-settings-btn");
   const testBtn = document.getElementById("test-connection-btn");
+  const loadBtn = document.getElementById("load-cloud-btn");
 
   // Load saved settings
   const apiKeyInput = document.getElementById("api-key");
   const binIdInput = document.getElementById("bin-id");
 
-  apiKeyInput.value = localStorage.getItem("jsonbin_api_key") || "";
-  binIdInput.value = localStorage.getItem("jsonbin_bin_id") || "";
+  const { apiKey, binId } = getStoredData();
+  apiKeyInput.value = apiKey || "";
+  binIdInput.value = binId || "";
 
   span.onclick = function () {
     modal.style.display = "none";
@@ -426,6 +446,27 @@ function setupCloudModal(editableAreas) {
       modal.style.display = "none";
     }
   };
+
+  if (loadBtn) {
+    loadBtn.onclick = async () => {
+      const apiKey = apiKeyInput.value.trim();
+      const binId = binIdInput.value.trim();
+      if (!apiKey || !binId) {
+        showToast("API Key and Bin ID required to load", "error");
+        return;
+      }
+
+      try {
+        await loadFromCloud(editableAreas, apiKey, binId, false);
+        // Save credentials if load successful
+        localStorage.setItem("jsonbin_api_key", apiKey);
+        localStorage.setItem("jsonbin_bin_id", binId);
+        modal.style.display = "none";
+      } catch (e) {
+        showToast("Load failed: " + e.message, "error");
+      }
+    };
+  }
 
   saveSettingsBtn.onclick = async () => {
     const apiKey = apiKeyInput.value.trim();
@@ -479,8 +520,7 @@ function openCloudModal() {
 async function handleGlobalSave(editableAreas, isManual = false) {
   saveToLocal(editableAreas);
 
-  const apiKey = localStorage.getItem("jsonbin_api_key");
-  const binId = localStorage.getItem("jsonbin_bin_id");
+  const { apiKey, binId } = getStoredData();
 
   if (apiKey) {
     await saveToCloud(editableAreas, apiKey, binId, isManual);
