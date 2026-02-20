@@ -38,10 +38,11 @@ function setupEditor() {
   });
 
   // 2. Setup Toolbar
-  const saveBtn = document.getElementById("save-pdf-btn");
-  if (saveBtn) {
-    saveBtn.addEventListener("click", () => {
+  const pdfBtn = document.getElementById("save-pdf-btn");
+  if (pdfBtn) {
+    pdfBtn.addEventListener("click", async () => {
       if (validateForm()) {
+        await handleGlobalSave(editableAreas, false);
         generatePDF();
       }
     });
@@ -52,6 +53,9 @@ function setupEditor() {
 
   // 4. Setup Print Listeners
   setupPrintHandling();
+
+  // 5. Setup Persistence
+  setupPersistence(editableAreas);
 }
 
 function setupPrintHandling() {
@@ -254,8 +258,10 @@ function generatePDF() {
   // Use browser's built-in print functionality for selectable text
   // Manually disable contentEditable before printing to ensure text is selectable
   // This is redundant with the 'beforeprint' listener but ensures it works for the button click
-  
-  const editableElements = document.querySelectorAll('[contenteditable="true"]');
+
+  const editableElements = document.querySelectorAll(
+    '[contenteditable="true"]',
+  );
   editableElements.forEach((el) => {
     el.contentEditable = "false";
     el.dataset.wasEditable = "true";
@@ -265,9 +271,287 @@ function generatePDF() {
 
   // Restore contentEditable after printing (in case afterprint didn't catch it)
   // Note: window.print() is blocking, so this runs after dialog closes
-  const elementsToRestore = document.querySelectorAll('[data-was-editable="true"]');
+  const elementsToRestore = document.querySelectorAll(
+    '[data-was-editable="true"]',
+  );
   elementsToRestore.forEach((el) => {
     el.contentEditable = "true";
     delete el.dataset.wasEditable;
   });
+}
+
+/* Persistence Logic */
+
+function setupPersistence(editableAreas) {
+  // Load initial data
+  loadFromLocal(editableAreas);
+
+  // Auto-save on input
+  document.addEventListener("input", (e) => {
+    if (e.target.classList.contains("editable-field")) {
+      saveToLocal(editableAreas);
+    }
+  });
+
+  // Buttons
+  const saveBtn = document.getElementById("save-local-btn");
+  const exportBtn = document.getElementById("export-json-btn");
+  const importBtn = document.getElementById("import-json-btn");
+  const fileInput = document.getElementById("file-input");
+  const cloudBtn = document.getElementById("cloud-sync-btn");
+
+  if (saveBtn) {
+    saveBtn.addEventListener("click", () => {
+      handleGlobalSave(editableAreas, true);
+    });
+  }
+
+  if (exportBtn) {
+    exportBtn.addEventListener("click", () => exportJSON(editableAreas));
+  }
+
+  if (importBtn) {
+    importBtn.addEventListener("click", () => fileInput.click());
+  }
+
+  if (fileInput) {
+    fileInput.addEventListener("change", (e) => importJSON(e, editableAreas));
+  }
+
+  if (cloudBtn) {
+    cloudBtn.addEventListener("click", openCloudModal);
+  }
+
+  // Modal Logic
+  setupCloudModal(editableAreas);
+}
+
+function getEditableData(editableAreas) {
+  const data = {};
+  editableAreas.forEach((area) => {
+    const elements = document.querySelectorAll(area.selector);
+    data[area.selector] = Array.from(elements).map((el) => el.innerHTML);
+  });
+  return data;
+}
+
+function setEditableData(data, editableAreas) {
+  if (!data) return;
+
+  editableAreas.forEach((area) => {
+    if (data[area.selector]) {
+      const elements = document.querySelectorAll(area.selector);
+      data[area.selector].forEach((html, index) => {
+        if (elements[index]) {
+          elements[index].innerHTML = html;
+        }
+      });
+    }
+  });
+}
+
+function saveToLocal(editableAreas) {
+  const data = getEditableData(editableAreas);
+  localStorage.setItem("cv_data", JSON.stringify(data));
+}
+
+function loadFromLocal(editableAreas) {
+  const dataStr = localStorage.getItem("cv_data");
+  if (dataStr) {
+    try {
+      const data = JSON.parse(dataStr);
+      setEditableData(data, editableAreas);
+    } catch (e) {
+      console.error("Error loading local data", e);
+    }
+  }
+}
+
+function exportJSON(editableAreas) {
+  const data = getEditableData(editableAreas);
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "cv-data.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importJSON(event, editableAreas) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      setEditableData(data, editableAreas);
+      saveToLocal(editableAreas); // Sync to local
+      alert("Data imported successfully!");
+    } catch (error) {
+      alert("Error importing file: " + error.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = ""; // Reset input
+}
+
+/* Cloud Sync (JSONBin) */
+
+function setupCloudModal(editableAreas) {
+  const modal = document.getElementById("cloud-modal");
+  const span = document.getElementsByClassName("close")[0];
+  const saveSettingsBtn = document.getElementById("save-settings-btn");
+  const testBtn = document.getElementById("test-connection-btn");
+
+  // Load saved settings
+  const apiKeyInput = document.getElementById("api-key");
+  const binIdInput = document.getElementById("bin-id");
+
+  apiKeyInput.value = localStorage.getItem("jsonbin_api_key") || "";
+  binIdInput.value = localStorage.getItem("jsonbin_bin_id") || "";
+
+  span.onclick = function () {
+    modal.style.display = "none";
+  };
+
+  window.onclick = function (event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  };
+
+  saveSettingsBtn.onclick = async () => {
+    const apiKey = apiKeyInput.value.trim();
+    let binId = binIdInput.value.trim();
+
+    if (!apiKey) {
+      alert("API Key is required");
+      return;
+    }
+
+    localStorage.setItem("jsonbin_api_key", apiKey);
+    if (binId) localStorage.setItem("jsonbin_bin_id", binId);
+
+    await saveToCloud(editableAreas, apiKey, binId, true);
+    modal.style.display = "none";
+  };
+
+  testBtn.onclick = async () => {
+    const apiKey = apiKeyInput.value.trim();
+    const binId = binIdInput.value.trim();
+    if (!apiKey) {
+      alert("Enter API Key");
+      return;
+    }
+
+    const statusDiv = document.getElementById("sync-status");
+    statusDiv.textContent = "Testing connection...";
+    statusDiv.className = "status-msg";
+
+    try {
+      if (binId) {
+        await loadFromCloud(editableAreas, apiKey, binId, true);
+        statusDiv.textContent = "Connection successful! Found existing bin.";
+        statusDiv.className = "status-msg status-success";
+      } else {
+        statusDiv.textContent =
+          "API Key looks good (cannot verify fully without Bin ID).";
+        statusDiv.className = "status-msg status-success";
+      }
+    } catch (e) {
+      statusDiv.textContent = "Error: " + e.message;
+      statusDiv.className = "status-msg status-error";
+    }
+  };
+}
+
+function openCloudModal() {
+  document.getElementById("cloud-modal").style.display = "block";
+}
+
+async function handleGlobalSave(editableAreas, isManual = false) {
+  saveToLocal(editableAreas);
+
+  const apiKey = localStorage.getItem("jsonbin_api_key");
+  const binId = localStorage.getItem("jsonbin_bin_id");
+
+  if (apiKey) {
+    await saveToCloud(editableAreas, apiKey, binId, isManual);
+  } else if (isManual) {
+    alert("Changes saved locally!");
+  }
+}
+
+async function saveToCloud(editableAreas, apiKey, binId, isManual = false) {
+  const data = getEditableData(editableAreas);
+
+  try {
+    let url = "https://api.jsonbin.io/v3/b";
+    let method = "POST";
+
+    if (binId) {
+      url = `https://api.jsonbin.io/v3/b/${binId}`;
+      method = "PUT";
+    }
+
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": apiKey,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const result = await response.json();
+
+    if (!binId && result.metadata && result.metadata.id) {
+      // New bin created
+      binId = result.metadata.id;
+      localStorage.setItem("jsonbin_bin_id", binId);
+      document.getElementById("bin-id").value = binId;
+      if (isManual) alert(`New Bin Created! ID: ${binId}`);
+    } else if (isManual) {
+      alert("Saved to Cloud Successfully!");
+    }
+
+    console.log("Saved to cloud", result);
+  } catch (e) {
+    console.error("Cloud save failed", e);
+    if (isManual) alert("Cloud save failed: " + e.message);
+  }
+}
+
+async function loadFromCloud(editableAreas, apiKey, binId, isTest = false) {
+  try {
+    const response = await fetch(
+      `https://api.jsonbin.io/v3/b/${binId}/latest`,
+      {
+        headers: {
+          "X-Master-Key": apiKey,
+        },
+      },
+    );
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const result = await response.json();
+    if (!isTest) {
+      setEditableData(result.record, editableAreas);
+      saveToLocal(editableAreas);
+      alert("Data loaded from cloud!");
+    }
+    return result;
+  } catch (e) {
+    console.error("Cloud load failed", e);
+    throw e;
+  }
 }

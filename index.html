@@ -13,6 +13,112 @@
     <!-- <link rel="stylesheet" href="style.css" /> -->
     <style>
       /* Editor UI Styles - These will be hidden in PDF */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: "Open Sans", sans-serif;
+      }
+
+      .btn-primary:hover {
+        background-color: #0056b3;
+      }
+
+      .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-right: 5px;
+      }
+
+      .btn-outline {
+        background-color: transparent;
+        border: 1px solid #007bff;
+        color: #007bff;
+        padding: 7px 15px; /* adjust for border */
+        border-radius: 4px;
+        cursor: pointer;
+        margin-right: 5px;
+      }
+
+      .btn-outline:hover {
+        background-color: #e7f1ff;
+      }
+
+      .status-msg {
+        margin-top: 10px;
+        font-size: 14px;
+      }
+      .status-success {
+        color: green;
+      }
+      .status-error {
+        color: red;
+      }
+
       .editable-field {
         cursor: text;
         transition:
@@ -30,6 +136,27 @@
         background-color: rgba(255, 255, 255, 1);
         outline: 2px solid #007bff;
         box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+      }
+
+      .name-presets {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+        justify-content: center;
+      }
+
+      .preset-btn {
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 4px 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.2s;
+      }
+
+      .preset-btn:hover {
+        background: #e0e0e0;
       }
 
       /* Floating Format Toolbar */
@@ -86,24 +213,9 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         display: flex;
         gap: 10px;
-        align-items: center;
+        flex-direction: column;
         z-index: 9999;
         border: 1px solid #eee;
-      }
-
-      #save-pdf-btn {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
-        font-weight: 600;
-        cursor: pointer;
-        font-family: "Open Sans", sans-serif;
-      }
-
-      #save-pdf-btn:hover {
-        background-color: #0056b3;
       }
 
       /* Print Styles for PDF Generation */
@@ -123,6 +235,7 @@
           background-color: transparent !important;
         }
 
+        .name-presets,
         #editor-toolbar,
         #format-toolbar {
           display: none !important;
@@ -246,7 +359,26 @@
   <body>
     <section class="info">
       <h1>Anderson Ho</h1>
-      <!-- Anderson Ho | Lam Ho Sy | Ho Sy Lam -->
+      <div class="name-presets">
+        <button
+          class="preset-btn"
+          onclick="document.querySelector('.info h1').innerText = 'Anderson Ho'"
+        >
+          Anderson Ho
+        </button>
+        <button
+          class="preset-btn"
+          onclick="document.querySelector('.info h1').innerText = 'Ho Sy Lam'"
+        >
+          Ho Sy Lam
+        </button>
+        <button
+          class="preset-btn"
+          onclick="document.querySelector('.info h1').innerText = 'Lam Ho Sy'"
+        >
+          Lam Ho Sy
+        </button>
+      </div>
       <div class="info-content">
         <div class="info-item">
           <svg
@@ -530,10 +662,80 @@
 
     <!-- Editor Toolbar -->
     <div id="editor-toolbar">
-      <span style="font-size: 14px; color: #666"
+      <span style="font-size: 14px; color: #666; margin-right: auto"
         >Interactive Resume Editor</span
       >
-      <button id="save-pdf-btn">Save as PDF</button>
+
+      <button
+        id="export-json-btn"
+        class="btn-secondary"
+        title="Download backup"
+      >
+        Export JSON
+      </button>
+      <button id="import-json-btn" class="btn-secondary" title="Load backup">
+        Import JSON
+      </button>
+      <input type="file" id="file-input" style="display: none" accept=".json" />
+      <button
+        id="cloud-sync-btn"
+        class="btn-outline"
+        title="Cloud Sync Settings"
+      >
+        Sync ☁️
+      </button>
+      <button
+        id="save-local-btn"
+        class="btn-primary"
+        title="Save changes locally"
+        style="margin-right: 5px"
+      >
+        Save
+      </button>
+      <button class="btn-primary" id="save-pdf-btn">Save as PDF</button>
+    </div>
+
+    <!-- Cloud Sync Modal -->
+    <div id="cloud-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Cloud Sync Settings</h2>
+        <p>
+          Sync your resume across devices using
+          <a href="https://jsonbin.io" target="_blank">JSONBin.io</a> (free).
+        </p>
+
+        <div class="form-group">
+          <label for="api-key">API Key (Master Key)</label>
+          <input
+            type="password"
+            id="api-key"
+            placeholder="Enter your JSONBin API Key"
+          />
+          <small>Get a key from jsonbin.io -> API Keys</small>
+        </div>
+
+        <div class="form-group">
+          <label for="bin-id">Bin ID (Auto-generated if empty)</label>
+          <input
+            type="text"
+            id="bin-id"
+            placeholder="Leave empty to create new bin"
+          />
+          <small>The ID where your resume data is stored.</small>
+        </div>
+
+        <div id="sync-status" class="status-msg"></div>
+
+        <div style="margin-top: 20px; text-align: right">
+          <button id="test-connection-btn" class="btn-secondary">
+            Test Connection
+          </button>
+          <button id="save-settings-btn" class="btn-primary">
+            Save & Sync
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Scripts -->
